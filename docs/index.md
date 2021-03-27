@@ -37,6 +37,46 @@ The rules are under active development, as such the lastest commit on the
 minimum supported version of Bazel. Though previous versions may still be
 supported in certain environments.
 
+### Setup rust-analyzer
+
+For [non-Cargo projects](https://rust-analyzer.github.io/manual.html#non-cargo-based-projects),
+rust-analyzer depends on a `rust-project.json` file at the root of the project
+that describes the its structure. The `rust_analyzer` rule facilitates
+generating such a file.
+
+First, add the following to the `WORKSPACE` file:
+
+```python
+load(
+    "@rules_rust//tools/rust_analyzer/raze:crates.bzl",
+    "rules_rust_tools_rust_analyzer_fetch_remote_crates",
+)
+rules_rust_tools_rust_analyzer_fetch_remote_crates()
+```
+
+Then, add a rule to the root `BUILD` file like the following.
+
+```python
+rust_analyzer(
+    name = "rust_analyzer",
+    targets = [ /* all the binary/library targets you want in the rust-project.json */ ],
+)
+```
+
+The targets list can be generated with something like:
+
+```
+bazel query 'kind("rust_library|rust_binary", //...:all)' | grep -v build_script | grep "//" | awk " { print \"'\" \$0 \"',\" }"
+```
+
+Note that visibility rules apply.
+
+Run `bazel run @rules_rust//tools/rust_analyzer:gen_rust_project` whenever
+dependencies change to regenerate the `rust-project.json` file. It should be
+added to `.gitignore` because it is effectively a build artifact. Once the
+`rust-project.json` has been generated in the project root, rust-analyzer can
+pick it up upon restart.
+
 ## Rules
 
 - [defs](defs.md): standard rust rules for building and testing libraries and binaries.
