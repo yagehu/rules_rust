@@ -1,8 +1,5 @@
-load(
-    "@rules_rust//rust:rust.bzl",
-    "rust_binary",
-)
-load("@rust_deps//:defs.bzl", "crate")
+load("@basic_deps//:defs.bzl", "crate")
+load("@rules_rust//rust:defs.bzl", "rust_binary")
 
 rust_binary(
     name = "basic",
@@ -16,6 +13,6 @@ rust_binary(
 sh_test(
     name = "test",
     srcs = ["test.sh"],
-    data = [":basic"],
     args = ["$(location :basic)"],
+    data = [":basic"],
 )

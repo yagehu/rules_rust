@@ -1,4 +1,3 @@
 docs
 examples
-examples/crate_universe
-examples/cargo_manifest_dir/external_crate
+crate_universe/private/bootstrap
